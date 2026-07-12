@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Torneo de Fútbol</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #10b981;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1, h2, h3 {
+            text-align: center;
+            color: var(--primary);
+        }
+        .setup-section, .tournament-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .groups-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        @media (max-width: 768px) {
+            .groups-container { grid-template-columns: 1fr; }
+        }
+        .group-box {
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            padding: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th { background-color: var(--primary); color: white; }
+        .match-card {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #f9fafb;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border-left: 4px solid var(--secondary);
+        }
+        .match-card input {
+            width: 40px;
+            text-align: center;
+            font-size: 16px;
+            padding: 3px;
+        }
+        button {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            transition: background 0.3s;
+        }
+        button:hover { background-color: #059669; }
+        .hidden { display: none; }
+        .bracket {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .phase { text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🏆 Gestor de Torneo de Fútbol</h1>
+
+    <div id="setup" class="setup-section">
+        <h2>Registro de Equipos</h2>
+        <div class="groups-container">
+            <div class="group-box">
+                <h3>Grupo A</h3>
+                <input type="text" id="a1" value="Equipo A1" style="width:90%; margin:5px; padding:5px;"><br>
+                <input type="text" id="a2" value="Equipo A2" style="width:90%; margin:5px; padding:5px;"><br>
+                <input type="text" id="a3" value="Equipo A3" style="width:90%; margin:5px; padding:5px;">
+            </div>
+            <div class="group-box">
+                <h3>Grupo B</h3>
+                <input type="text" id="b1" value="Equipo B1" style="width:90%; margin:5px; padding:5px;"><br>
+                <input type="text" id="b2" value="Equipo B2" style="width:90%; margin:5px; padding:5px;"><br>
+                <input type="text" id="b3" value="Equipo B3" style="width:90%; margin:5px; padding:5px;">
+            </div>
+        </div>
+        <button onclick="iniciarTorneo()">Generar Torneo</button>
+    </div>
+
+    <div id="tournament" class="tournament-section hidden">
+        <h2>Tablas de Posiciones</h2>
+        <div class="groups-container">
+            <div>
+                <h3>Grupo A</h3>
+                <table>
+                    <thead>
+                        <tr><th>Equipo</th><th>Pts</th><th>PJ</th><th>GF</th><th>GC</th></tr>
+                    </thead>
+                    <tbody id="tabla-A"></tbody>
+                </table>
+            </div>
+            <div>
+                <h3>Grupo B</h3>
+                <table>
+                    <thead>
+                        <tr><th>Equipo</th><th>Pts</th><th>PJ</th><th>GF</th><th>GC</th></tr>
+                    </thead>
+                    <tbody id="tabla-B"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <hr style="margin: 40px 0; border: 1px solid #eee;">
+
+        <h2>Calendario de Partidos (Fase de Grupos)</h2>
+        <div id="partidos-lista"></div>
+        <button onclick="actualizarTorneo()">Actualizar Tabla y Verificar Clasificados</button>
+
+        <hr style="margin: 40px 0; border: 1px solid #eee;">
+
+        <div id="eliminatorias-seccion" class="hidden">
+            <h2>Fase Final (Eliminatoria Directa)</h2>
+            <div class="bracket">
+                <div class="phase">
+                    <h3>Semifinales</h3>
+                    <div id="semi1" class="match-card"></div>
+                    <div id="semi2" class="match-card"></div>
+                </div>
+                <div class="phase">
+                    <h3>Gran Final</h3>
+                    <div id="final-match" class="match-card"></div>
+                    <button onclick="definirCampeon()" id="btn-campeon">Definir Campeón</button>
+                </div>
+            </div>
+            <h1 id="campeon-anuncio" style="color: var(--secondary); margin-top: 30px;"></h1>
+        </div>
+    </div>
+</div>
+
+<script>
+    let equipos = { A: [], B: [] };
+    let partidos = [];
+    let semifinales = [];
+    let granFinal = {};
+
+    function iniciarTorneo() {
+        equipos.A = [
+            { nombre: document.getElementById('a1').value, pts: 0, pj: 0, gf: 0, gc: 0, grupo: 'A' },
+            { nombre: document.getElementById('a2').value, pts: 0, pj: 0, gf: 0, gc: 0, grupo: 'A' },
+            { nombre: document.getElementById('a3').value, pts: 0, pj: 0, gf: 0, gc: 0, grupo: 'A' }
+        ];
+        equipos.B = [
+            { nombre: document.getElementById('b1').value, pts: 0, pj: 0, gf: 0, gc: 0, grupo: 'B' },
+            { nombre: document.getElementById('b2').value, pts: 0, pj: 0, gf: 0, gc: 0, bundle: 'B' },
+            { nombre: document.getElementById('b3').value, pts: 0, pj: 0, gf: 0, gc: 0, grupo: 'B' }
+        ];
+
+        generarCalendario();
+        document.getElementById('setup').classList.add('hidden');
+        document.getElementById('tournament').classList.remove('hidden');
+        renderTablas();
+    }
+
+    function generarCalendario() {
+        partidos = [];
+        // 1. Partidos Intragrupo (A contra A, B contra B)
+        for(let i=0; i<3; i++) {
+            for(let j=i+1; j<3; j++) {
+                partidos.push({ local: equipos.A[i], visitante: equipos.A[j], golesL: null, golesV: null, tipo: 'Intragrupo' });
+                partidos.push({ local: equipos.B[i], visitante: equipos.B[j], golesL: null, golesV: null, tipo: 'Intragrupo' });
+            }
+        }
+        // 2. Partidos Intergrupo (A contra B)
+        for(let i=0; i<3; i++) {
+            for(let j=0; j<3; j++) {
+                partidos.push({ local: equipos.A[i], visitante: equipos.B[j], golesL: null, golesV: null, tipo: 'Intergrupo' });
+            }
+        }
+
+        renderPartidos();
+    }
+
+    function renderPartidos() {
+        const contenedor = document.getElementById('partidos-lista');
+        contenedor.innerHTML = '';
+        partidos.forEach((partido, index) => {
+            contenedor.innerHTML += `
+                <div class="match-card">
+                    <span style="font-size:12px; color:gray; width:80px;">${partido.tipo}</span>
+                    <span style="width:150px; text-align:right;"><b>${partido.local.nombre}</b></span>
+                    <input type="number" id="p-${index}-L" min="0" onchange="guardarResultado(${index})">
+                    <span>vs</span>
+                    <input type="number" id="p-${index}-V" min="0" onchange="guardarResultado(${index})">
+                    <span style="width:150px; text-align:left;"><b>${partido.visitante.nombre}</b></span>
+                </div>
+            `;
+        });
+    }
+
+    function guardarResultado(index) {
+        const gL = document.getElementById(`p-${index}-L`).value;
+        const gV = document.getElementById(`p-${index}-V`).value;
+        
+        if(gL !== '' && gV !== '') {
+            partidos[index].golesL = parseInt(gL);
+            partidos[index].golesV = parseInt(gV);
+        }
+    }
+
+    function actualizarTorneo() {
+        // Reiniciar estadísticas
+        [...equipos.A, ...equipos.B].forEach(e => { e.pts = 0; e.pj = 0; e.gf = 0; e.gc = 0; });
+
+        // Calcular con partidos jugados
+        partidos.forEach(p => {
+            if(p.golesL !== null && p.golesV !== null) {
+                p.local.pj++; p.visitante.pj++;
+                p.local.gf += p.golesL; p.local.gc += p.golesV;
+                p.visitante.gf += p.golesV; p.visitante.gc += p.golesL;
+
+                if(p.golesL > p.golesV) p.local.pts += 3;
+                else if(p.golesV > p.golesL) p.visitante.pts += 3;
+                else { p.local.pts += 1; p.visitante.pts += 1; }
+            }
+        });
+
+        // Ordenar tablas (Criterio: Puntos, luego Diferencia de Goles)
+        equipos.A.sort((a,b) => b.pts - a.pts || (b.gf - b.gc) - (a.gf - a.gc));
+        equipos.B.sort((a,b) => b.pts - a.pts || (b.gf - b.gc) - (a.gf - a.gc));
+
+        renderTablas();
+
+        // Verificar si todos los partidos de grupo terminaron para armar semifinales
+        const listos = partidos.every(p => p.golesL !== null && p.golesV !== null);
+        if(listos) {
+            armarSemifinales();
+        }
+    }
+
+    function renderTablas() {
+        ['A', 'B'].forEach(g => {
+            const tbody = document.getElementById(`tabla-${g}`);
+            tbody.innerHTML = '';
+            equipos[g].forEach(e => {
+                tbody.innerHTML += `<tr><td>${e.nombre}</td><td>${e.pts}</td><td>${e.pj}</td><td>${e.gf}</td><td>${e.gc}</td></tr>`;
+            });
+        });
+    }
+
+    function armarSemifinales() {
+        document.getElementById('eliminatorias-seccion').classList.remove('hidden');
+        
+        semifinales = [
+            { local: equipos.A[0].nombre, visitante: equipos.B[1].nombre }, // 1ºA vs 2ºB
+            { local: equipos.B[0].nombre, visitante: equipos.A[1].nombre }  // 1ºB vs 2ºA
+        ];
+
+        document.getElementById('semi1').innerHTML = `
+            <span>${semifinales[0].local}</span> <input type="number" id="s1-L"> vs <input type="number" id="s1-V"> <span>${semifinales[0].visitante}</span>
+        `;
+        document.getElementById('semi2').innerHTML = `
+            <span>${semifinales[1].local}</span> <input type="number" id="s2-L"> vs <input type="number" id="s2-V"> <span>${semifinales[1].visitante}</span>
+        `;
+        
+        // Habilitar el botón de la final cuando se actualicen los campos correspondientes
+        document.getElementById('btn-campeon').setAttribute('onclick', 'armarFinal()');
+        document.getElementById('btn-campeon').innerText = "Generar Final";
+    }
+
+    function armarFinal() {
+        const s1L = parseInt(document.getElementById('s1-L').value);
+        const s1V = parseInt(document.getElementById('s1-V').value);
+        const s2L = parseInt(document.getElementById('s2-L').value);
+        const s2V = parseInt(document.getElementById('s2-V').value);
+
+        if(isNaN(s1L) || isNaN(s1V) || isNaN(s2L) || isNaN(s2V)) {
+            alert("Por favor, ingresa los resultados de ambas semifinales.");
+            return;
+        }
+
+        if(s1L === s1V || s2L === s2V) {
+            alert("En eliminatoria directa debe haber un ganador (puedes definirlo por penales si empatan).");
+            return;
+        }
+
+        const ganadorSemi1 = (s1L > s1V) ? semifinales[0].local : semifinales[0].visitante;
+        const ganadorSemi2 = (s2L > s2V) ? semifinales[1].local : semifinales[1].visitante;
+
+        granFinal = { local: ganadorSemi1, visitante: ganadorSemi2 };
+
+        document.getElementById('final-match').innerHTML = `
+            <span>${granFinal.local}</span> <input type="number" id="f-L"> vs <input type="number" id="f-V"> <span>${granFinal.visitante}</span>
+        `;
+
+        document.getElementById('btn-campeon').setAttribute('onclick', 'definirCampeon()');
+        document.getElementById('btn-campeon').innerText = "Definir Campeón";
+    }
+
+    function definirCampeon() {
+        const fL = parseInt(document.getElementById('f-L').value);
+        const fV = parseInt(document.getElementById('f-V').value);
+
+        if(isNaN(fL) || isNaN(fV)) {
+            alert("Por favor, ingresa el resultado de la final.");
+            return;
+        }
+        if(fL === fV) {
+            alert("Debe haber un campeón. Desempata por penales si es necesario.");
+            return;
+        }
+
+        const campeon = (fL > fV) ? granFinal.local : granFinal.visitante;
+        document.getElementById('campeon-anuncio').innerText = `🎉 ¡EL CAMPEÓN ES ${campeon.toUpperCase()}! 🎉`;
+    }
+</script>
+</body>
+</html>
