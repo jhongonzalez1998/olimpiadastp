@@ -119,7 +119,7 @@
 
 <div class="container">
     <h1>🏆 Torneo de Fútbol <span class="live-badge">EN VIVO</span></h1>
-    <p style="text-align: center; color: gray;">Resultados actualizados desde Google Sheets</p>
+    <p style="text-align: center; color: gray;">Resultados actualizados desde Google Sheets (CSV)</p>
     
     <button onclick="cargarDatosDesdeGoogle()">🔄 Recargar Resultados Manualmente</button>
 
@@ -188,34 +188,40 @@
 </div>
 
 <script>
-    // ID de tu Google Sheet ya configurado correctamente
-    const SHEET_ID = '19ZT21J2kGuyKPSkGWswVMNuEL8l7y9g4Rl-V-ssSygs'; 
-    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+    // ⚠️ PEGA AQUÍ TU ENLACE DE PUBLICACIÓN EN LA WEB (CSV) ⚠️
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQHhMSGg5Au2lIFI7rh3iMZFX-ucTcgs1vLsqFAPMALrDKp2MK-W6GuOz-WhGubjpyv-6Z9DXxnTpfB/pub?output=csv'; 
 
     let equiposA = {};
     let equiposB = {};
 
     async function cargarDatosDesdeGoogle() {
         try {
-            const respuesta = await fetch(SHEET_URL);
-            const texto = await respuesta.text();
-            const jsonText = texto.substring(47, texto.length - 2);
-            const data = JSON.parse(jsonText);
+            const respuesta = await fetch(CSV_URL);
+            const textoCSV = await respuesta.text();
             
-            const filas = data.table.rows;
+            // Procesar las líneas del CSV
+            const lineas = textoCSV.split('\n').map(linea => linea.split(','));
             
             equiposA = {};
             equiposB = {};
             const partidosHTML = [];
 
-            filas.forEach(fila => {
-                const grupo = fila.c[0] ? fila.c[0].v : '';
-                const local = fila.c[1] ? fila.c[1].v : '';
-                const golesL = (fila.c[2] && fila.c[2].v !== null) ? parseInt(fila.c[2].v) : null;
-                const golesV = (fila.c[3] && fila.c[3].v !== null) ? parseInt(fila.c[3].v) : null;
-                const visitante = fila.c[4] ? fila.c[4].v : '';
+            // Empezamos en i = 1 para saltarnos la fila de encabezados (Grupo, Local, etc.)
+            for (let i = 1; i < lineas.length; i++) {
+                const fila = lineas[i];
+                if (fila.length < 5) continue;
 
-                if(!local || !visitante) return;
+                // Limpiar comillas extras si Google Sheets las añade
+                const grupo = fila[0].replace(/"/g, '').trim();
+                const local = fila[1].replace(/"/g, '').trim();
+                const golesLRaw = fila[2].replace(/"/g, '').trim();
+                const golesVRaw = fila[3].replace(/"/g, '').trim();
+                const visitante = fila[4].replace(/"/g, '').trim();
+
+                if (!local || !visitante) continue;
+
+                const golesL = golesLRaw !== "" ? parseInt(golesLRaw) : null;
+                const golesV = golesVRaw !== "" ? parseInt(golesVRaw) : null;
 
                 if (grupo === 'A') {
                     if (!equiposA[local]) equiposA[local] = { nombre: local, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 };
@@ -225,9 +231,9 @@
                     if (!equiposB[visitante]) equiposB[visitante] = { nombre: visitante, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 };
                 }
 
-                if (golesL !== null && golesV !== null) {
+                if (golesL !== null && !isNaN(golesL) && golesV !== null && !isNaN(golesV)) {
                     let eqL = grupo === 'A' ? equiposA[local] : equiposB[local];
-                    let eqV = grupo === 'A' ? equiposA[visitante] : equiposB[visitante];
+                    let eqV = group === 'A' || grupo === 'A' ? equiposA[visitante] : equiposB[visitante];
 
                     eqL.pj++; eqV.pj++;
                     eqL.gf += golesL; eqL.gc += golesV;
@@ -240,8 +246,9 @@
                     else { eqL.pts += 1; eqV.pts += 1; }
                 }
 
-                const displayL = golesL !== null ? golesL : '-';
-                const displayV = golesV !== null ? golesV : '-';
+                const displayL = (golesL !== null && !isNaN(golesL)) ? golesL : '-';
+                const displayV = (golesV !== null && !isNaN(golesV)) ? golesV : '-';
+                
                 partidosHTML.push(`
                     <div class="match-card">
                         <span style="font-size:12px; color:gray; width:60px;">Grupo ${grupo}</span>
@@ -252,14 +259,14 @@
                         <span style="width:180px; text-align:left;"><b>${visitante}</b></span>
                     </div>
                 `);
-            });
+            }
 
             document.getElementById('partidos-lista').innerHTML = partidosHTML.join('');
             procesarYRenderizarTablas();
 
         } catch (error) {
             console.error("Error cargando datos:", error);
-            alert("No se pudo cargar los datos en vivo. Recuerda poner la hoja en modo 'Cualquier persona con el enlace' como Lector.");
+            alert("No se pudieron procesar los datos. Verifica el enlace 'Publicar en la web' en formato CSV.");
         }
     }
 
