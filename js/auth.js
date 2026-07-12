@@ -31,27 +31,29 @@ function mostrarVista(vista) {
 
 // Iniciar sesión con el usuario de Supabase Auth
 async function iniciarSesion() {
-  const email = document.getElementById("login-email").value;
-  const password = document.getElementById("login-password").value;
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
 
-  const { data, error } = await _supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+    const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
 
-  if (error) {
-    alert("Error de autenticación: " + error.message);
-  } else {
-    usuarioActual = data.user;
-
-    // Ajustar botones de la barra de navegación
-    document.getElementById("btn-logout").classList.remove("hidden");
-    document.getElementById("btn-vista-admin").classList.add("hidden");
-
-    mostrarVista("admin");
-    // Inicializar los datos del panel de administrador (Cargados desde torneo.js)
-    if (typeof cargarPanelAdmin === "function") cargarPanelAdmin();
-  }
+    if (error) {
+        alert("Error de autenticación: " + error.message);
+    } else {
+        usuarioActual = data.user;
+        
+        // Ajustar botones de la barra de navegación
+        document.getElementById('btn-logout').classList.remove('hidden');
+        document.getElementById('btn-vista-admin').classList.add('hidden');
+        
+        mostrarVista('admin');
+        
+        // 🔥 Forzar la carga del panel de administración inmediatamente
+        if (typeof cargarPanelAdmin === 'function') {
+            await cargarPanelAdmin();
+        } else {
+            console.error("La función cargarPanelAdmin no está definida en torneo.js");
+        }
+    }
 }
 
 // Cerrar sesión
