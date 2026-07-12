@@ -68,10 +68,10 @@
 
     <script>
         // 🛠️ REEMPLAZA ESTO CON EL ID DE TU GOOGLE SHEET
-        const HOJA_ID = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTR70deHYSZ2eo2aCAl4YPwW3QU-4iml0U3_1oaLf75G3H3zeTbw5D1qQYEc0RQ0qZdfUcqQ-nrB7Cc/pub?gid=0&single=true&output=csv"; 
+        const HOJA_ID = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTR70deHYSZ2eo2aCAl4YPwW3QU-4iml0U3_1oaLf75G3H3zeTbw5D1qQYEc0RQ0qZdfUcqQ-nrB7Cc/pub?output=csv"; 
         
         // El truco definitivo: Pedimos los datos como un CSV para no usar APIs raras ni tokens
-        const URL_CSV = `https://docs.google.com/spreadsheets/d/${HOJA_ID}/pub?output=csv`;
+        const URL_CSV = `https://docs.google.com/spreadsheets/d/e/2PACX-1vTR70deHYSZ2eo2aCAl4YPwW3QU-4iml0U3_1oaLf75G3H3zeTbw5D1qQYEc0RQ0qZdfUcqQ-nrB7Cc/pub?output=csv`;
 
         async function consultarExcel() {
             try {
