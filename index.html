@@ -123,7 +123,6 @@
     
     <button onclick="cargarDatosDesdeGoogle()">🔄 Recargar Resultados Manualmente</button>
 
-    <!-- TABLAS DE POSICIONES -->
     <div class="section">
         <h2>Tablas de Posiciones</h2>
         <div class="groups-container">
@@ -148,13 +147,11 @@
         </div>
     </div>
 
-    <!-- PARTIDOS -->
     <div class="section">
         <h2>Resultados Fase de Grupos</h2>
         <div id="partidos-lista">Cargando partidos...</div>
     </div>
 
-    <!-- ELIMINATORIA DIRECTA -->
     <div id="eliminatorias-seccion" class="section">
         <h2>Fase Final (Eliminatoria Directa)</h2>
         <p style="text-align:center; font-size:13px; color:gray;">Nota: Define los cruces de las fases eliminatorias aquí mismo conforme terminen los grupos.</p>
@@ -172,7 +169,7 @@
                 <div class="match-card">
                     <span id="lbl-s2-L">2º Lugar A</span> 
                     <input type="number" id="s2-L" min="0"> vs <input type="number" id="s2-V" min="0"> 
-                    <span id="lbl-s2-V">1º Lugar B</span>
+                    <span id="lbl-s2-B">1º Lugar B</span>
                 </div>
                 <button onclick="generarFinal()">Avanzar a la Final</button>
             </div>
@@ -191,7 +188,7 @@
 </div>
 
 <script>
-    // ⚠️ REEMPLAZA ESTE ID POR EL DE TU GOOGLE SHEET ⚠️
+    // ID de tu Google Sheet ya configurado correctamente
     const SHEET_ID = '19ZT21J2kGuyKPSkGWswVMNuEL8l7y9g4Rl-V-ssSygs'; 
     const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
@@ -202,13 +199,11 @@
         try {
             const respuesta = await fetch(SHEET_URL);
             const texto = await respuesta.text();
-            // Limpiar la respuesta JSON extraña que devuelve Google
             const jsonText = texto.substring(47, texto.length - 2);
             const data = JSON.parse(jsonText);
             
             const filas = data.table.rows;
             
-            // Reiniciar estructuras de datos
             equiposA = {};
             equiposB = {};
             const partidosHTML = [];
@@ -222,7 +217,6 @@
 
                 if(!local || !visitante) return;
 
-                // Inicializar equipos en los objetos si no existen
                 if (grupo === 'A') {
                     if (!equiposA[local]) equiposA[local] = { nombre: local, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 };
                     if (!equiposA[visitante]) equiposA[visitante] = { nombre: visitante, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 };
@@ -231,7 +225,6 @@
                     if (!equiposB[visitante]) equiposB[visitante] = { nombre: visitante, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 };
                 }
 
-                // Calcular estadísticas si el partido ya se jugó (tiene goles anotados)
                 if (golesL !== null && golesV !== null) {
                     let eqL = grupo === 'A' ? equiposA[local] : equiposB[local];
                     let eqV = grupo === 'A' ? equiposA[visitante] : equiposB[visitante];
@@ -247,7 +240,6 @@
                     else { eqL.pts += 1; eqV.pts += 1; }
                 }
 
-                // Armar tarjeta de partido para la interfaz
                 const displayL = golesL !== null ? golesL : '-';
                 const displayV = golesV !== null ? golesV : '-';
                 partidosHTML.push(`
@@ -267,20 +259,17 @@
 
         } catch (error) {
             console.error("Error cargando datos:", error);
-            alert("No se pudo cargar los datos en vivo. Asegúrate de haber colocado correctamente el ID de tu Google Sheet y que sea público.");
+            alert("No se pudo cargar los datos en vivo. Recuerda poner la hoja en modo 'Cualquier persona con el enlace' como Lector.");
         }
     }
 
     function procesarYRenderizarTablas() {
-        // Convertir objetos a arreglos y ordenar (Pts -> DG -> GF)
         let listaA = Object.values(equiposA).sort((a,b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf);
         let listaB = Object.values(equiposB).sort((a,b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf);
 
-        // Asegurar que si la lista está vacía o incompleta muestre marcadores de posición
         renderTablaHtml(listaA, 'tabla-A');
         renderTablaHtml(listaB, 'tabla-B');
 
-        // Si ya hay clasificados definidos en la tabla, sugerir los nombres en las etiquetas de las Semifinales
         if(listaA.length >= 2 && listaB.length >= 2) {
             document.getElementById('lbl-s1-L').innerText = `1ºA: ${listaA[0].nombre}`;
             document.getElementById('lbl-s1-V').innerText = `2ºB: ${listaB[1].nombre}`;
@@ -308,7 +297,6 @@
         });
     }
 
-    // Lógica interna para la fase eliminatoria express en pantalla
     let ganadorS1 = "";
     let ganadorS2 = "";
 
@@ -323,7 +311,7 @@
             return;
         }
         if(s1L === s1V || s2L === s2V) {
-            alert("No puede haber empates en semifinales. Desempata por penales en la cancha.");
+            alert("No puede haber empates en semifinales. Desempata por penales.");
             return;
         }
 
@@ -351,7 +339,6 @@
         document.getElementById('campeon-anuncio').innerText = `🎉 ¡EL CAMPEÓN DEL TORNEO ES ${campeon.toUpperCase()}! 🎉`;
     }
 
-    // Auto-cargar al abrir la página y actualizar automáticamente cada 30 segundos
     cargarDatosDesdeGoogle();
     setInterval(cargarDatosDesdeGoogle, 30000); 
 </script>
