@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torneo de Fútbol en Vivo</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #10b981;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1, h2, h3 {
+            text-align: center;
+            color: var(--primary);
+        }
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .groups-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        @media (max-width: 768px) {
+            .groups-container { grid-template-columns: 1fr; }
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th { background-color: var(--primary); color: white; }
+        .match-card {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            background: #f9fafb;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border-left: 4px solid var(--secondary);
+            font-size: 16px;
+        }
+        .live-badge {
+            background-color: #ef4444;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+        .bracket {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .phase { text-align: center; width: 45%; }
+        .score-display {
+            font-weight: bold;
+            background: #e5e7eb;
+            padding: 4px 10px;
+            border-radius: 4px;
+            min-width: 25px;
+            display: inline-block;
+        }
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            margin: 10px auto;
+        }
+        input[type="number"] {
+            width: 45px;
+            text-align: center;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🏆 Torneo de Fútbol <span class="live-badge">EN VIVO</span></h1>
+    <p style="text-align: center; color: gray;">Resultados actualizados desde Google Sheets</p>
+    
+    <button onclick="cargarDatosDesdeGoogle()">🔄 Recargar Resultados Manualmente</button>
+
+    <!-- TABLAS DE POSICIONES -->
+    <div class="section">
+        <h2>Tablas de Posiciones</h2>
+        <div class="groups-container">
+            <div>
+                <h3>Grupo A</h3>
+                <table>
+                    <thead>
+                        <tr><th>Equipo</th><th>Pts</th><th>PJ</th><th>GF</th><th>GC</th><th>DG</th></tr>
+                    </thead>
+                    <tbody id="tabla-A"><tr><td colspan="6">Cargando...</td></tr></tbody>
+                </table>
+            </div>
+            <div>
+                <h3>Grupo B</h3>
+                <table>
+                    <thead>
+                        <tr><th>Equipo</th><th>Pts</th><th>PJ</th><th>GF</th><th>GC</th><th>DG</th></tr>
+                    </thead>
+                    <tbody id="tabla-B"><tr><td colspan="6">Cargando...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- PARTIDOS -->
+    <div class="section">
+        <h2>Resultados Fase de Grupos</h2>
+        <div id="partidos-lista">Cargando partidos...</div>
+    </div>
+
+    <!-- ELIMINATORIA DIRECTA -->
+    <div id="eliminatorias-seccion" class="section">
+        <h2>Fase Final (Eliminatoria Directa)</h2>
+        <p style="text-align:center; font-size:13px; color:gray;">Nota: Define los cruces de las fases eliminatorias aquí mismo conforme terminen los grupos.</p>
+        <div class="bracket">
+            <div class="phase">
+                <h3>Semifinales</h3>
+                <p style="font-size:12px; color:gray; margin-bottom: 2px;">Semi 1 (1ºA vs 2ºB)</p>
+                <div class="match-card">
+                    <span id="lbl-s1-L">1º Lugar A</span> 
+                    <input type="number" id="s1-L" min="0"> vs <input type="number" id="s1-V" min="0"> 
+                    <span id="lbl-s1-V">2º Lugar B</span>
+                </div>
+                
+                <p style="font-size:12px; color:gray; margin: 15px 0 2px 0;">Semi 2 (2ºA vs 1ºB)</p>
+                <div class="match-card">
+                    <span id="lbl-s2-L">2º Lugar A</span> 
+                    <input type="number" id="s2-L" min="0"> vs <input type="number" id="s2-V" min="0"> 
+                    <span id="lbl-s2-V">1º Lugar B</span>
+                </div>
+                <button onclick="generarFinal()">Avanzar a la Final</button>
+            </div>
+            <div class="phase">
+                <h3>Gran Final</h3>
+                <div class="match-card">
+                    <span id="final-L">Ganador Semi 1</span> 
+                    <input type="number" id="f-L" min="0"> vs <input type="number" id="f-V" min="0"> 
+                    <span id="final-V">Ganador Semi 2</span>
+                </div>
+                <button onclick="definirCampeon()" style="background-color: var(--secondary);">🏆 Definir Campeón</button>
+            </div>
+        </div>
+        <h1 id="campeon-anuncio" style="text-align:center; color: var(--secondary); margin-top: 30px;"></h1>
+    </div>
+</div>
+
+<script>
+    // ⚠️ REEMPLAZA ESTE ID POR EL DE TU GOOGLE SHEET ⚠️
+    const SHEET_ID = 'TU_ID_DE_GOOGLE_SHEETS_AQUI'; 
+    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+
+    let equiposA = {};
+    let equiposB = {};
+
+    async function cargarDatosDesdeGoogle() {
+        try {
+            const respuesta = await fetch(SHEET_URL);
+            const texto = await respuesta.text();
+            // Limpiar la respuesta JSON extraña que devuelve Google
+            const jsonText = texto.substring(47, texto.length - 2);
+            const data = JSON.parse(jsonText);
+            
+            const filas = data.table.rows;
+            
+            // Reiniciar estructuras de datos
+            equiposA = {};
+            equiposB = {};
+            const partidosHTML = [];
+
+            filas.forEach(fila => {
+                const grupo = fila.c[0] ? fila.c[0].v : '';
+                const local = fila.c[1] ? fila.c[1].v : '';
+                const golesL = (fila.c[2] && fila.c[2].v !== null) ? parseInt(fila.c[2].v) : null;
+                const golesV = (fila.c[3] && fila.c[3].v !== null) ? parseInt(fila.c[3].v) : null;
+                const visitante = fila.c[4] ? fila.c[4].v : '';
+
+                if(!local || !visitante) return;
+
+                // Inicializar equipos en los objetos si no existen
+                if (grupo === 'A') {
+                    if (!equiposA[local]) equiposA[local] = { nombre: local, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 };
+                    if (!equiposA[visitante]) equiposA[visitante] = { nombre: visitante, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 };
+                } else if (grupo === 'B') {
+                    if (!equiposB[local]) equiposB[local] = { nombre: local, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 };
+                    if (!equiposB[visitante]) equiposB[visitante] = { nombre: visitante, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 };
+                }
+
+                // Calcular estadísticas si el partido ya se jugó (tiene goles anotados)
+                if (golesL !== null && golesV !== null) {
+                    let eqL = grupo === 'A' ? equiposA[local] : equiposB[local];
+                    let eqV = grupo === 'A' ? equiposA[visitante] : equiposB[visitante];
+
+                    eqL.pj++; eqV.pj++;
+                    eqL.gf += golesL; eqL.gc += golesV;
+                    eqV.gf += golesV; eqV.gc += golesL;
+                    eqL.dg = eqL.gf - eqL.gc;
+                    eqV.dg = eqV.gf - eqV.gc;
+
+                    if (golesL > golesV) eqL.pts += 3;
+                    else if (golesV > golesL) eqV.pts += 3;
+                    else { eqL.pts += 1; eqV.pts += 1; }
+                }
+
+                // Armar tarjeta de partido para la interfaz
+                const displayL = golesL !== null ? golesL : '-';
+                const displayV = golesV !== null ? golesV : '-';
+                partidosHTML.push(`
+                    <div class="match-card">
+                        <span style="font-size:12px; color:gray; width:60px;">Grupo ${grupo}</span>
+                        <span style="width:180px; text-align:right;"><b>${local}</b></span>
+                        <span class="score-display">${displayL}</span>
+                        <span>vs</span>
+                        <span class="score-display">${displayV}</span>
+                        <span style="width:180px; text-align:left;"><b>${visitante}</b></span>
+                    </div>
+                `);
+            });
+
+            document.getElementById('partidos-lista').innerHTML = partidosHTML.join('');
+            procesarYRenderizarTablas();
+
+        } catch (error) {
+            console.error("Error cargando datos:", error);
+            alert("No se pudo cargar los datos en vivo. Asegúrate de haber colocado correctamente el ID de tu Google Sheet y que sea público.");
+        }
+    }
+
+    function procesarYRenderizarTablas() {
+        // Convertir objetos a arreglos y ordenar (Pts -> DG -> GF)
+        let listaA = Object.values(equiposA).sort((a,b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf);
+        let listaB = Object.values(equiposB).sort((a,b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf);
+
+        // Asegurar que si la lista está vacía o incompleta muestre marcadores de posición
+        renderTablaHtml(listaA, 'tabla-A');
+        renderTablaHtml(listaB, 'tabla-B');
+
+        // Si ya hay clasificados definidos en la tabla, sugerir los nombres en las etiquetas de las Semifinales
+        if(listaA.length >= 2 && listaB.length >= 2) {
+            document.getElementById('lbl-s1-L').innerText = `1ºA: ${listaA[0].nombre}`;
+            document.getElementById('lbl-s1-V').innerText = `2ºB: ${listaB[1].nombre}`;
+            document.getElementById('lbl-s2-L').innerText = `2ºA: ${listaA[1].nombre}`;
+            document.getElementById('lbl-s2-B').innerText = `1ºB: ${listaB[0].nombre}`;
+        }
+    }
+
+    function renderTablaHtml(lista, elementoId) {
+        const tbody = document.getElementById(elementoId);
+        tbody.innerHTML = '';
+        if(lista.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6">Sin datos de equipos</td></tr>`;
+            return;
+        }
+        lista.forEach(e => {
+            tbody.innerHTML += `<tr>
+                <td><b>${e.nombre}</b></td>
+                <td>${e.pts}</td>
+                <td>${e.pj}</td>
+                <td>${e.gf}</td>
+                <td>${e.gc}</td>
+                <td>${e.dg >= 0 ? '+'+e.dg : e.dg}</td>
+            </tr>`;
+        });
+    }
+
+    // Lógica interna para la fase eliminatoria express en pantalla
+    let ganadorS1 = "";
+    let ganadorS2 = "";
+
+    function generarFinal() {
+        const s1L = parseInt(document.getElementById('s1-L').value);
+        const s1V = parseInt(document.getElementById('s1-V').value);
+        const s2L = parseInt(document.getElementById('s2-L').value);
+        const s2V = parseInt(document.getElementById('s2-V').value);
+
+        if(isNaN(s1L) || isNaN(s1V) || isNaN(s2L) || isNaN(s2V)) {
+            alert("Por favor, digita los goles de las dos semifinales.");
+            return;
+        }
+        if(s1L === s1V || s2L === s2V) {
+            alert("No puede haber empates en semifinales. Desempata por penales en la cancha.");
+            return;
+        }
+
+        ganadorS1 = s1L > s1V ? document.getElementById('lbl-s1-L').innerText.split(': ')[1] : document.getElementById('lbl-s1-V').innerText.split(': ')[1];
+        ganadorS2 = s2L > s2V ? document.getElementById('lbl-s2-L').innerText.split(': ')[1] : document.getElementById('lbl-s2-B').innerText.split(': ')[1];
+
+        document.getElementById('final-L').innerText = ganadorS1;
+        document.getElementById('final-V').innerText = ganadorS2;
+    }
+
+    function definirCampeon() {
+        const fL = parseInt(document.getElementById('f-L').value);
+        const fV = parseInt(document.getElementById('f-V').value);
+
+        if(isNaN(fL) || isNaN(fV)) {
+            alert("Ingresa el marcador de la Gran Final.");
+            return;
+        }
+        if(fL === fV) {
+            alert("Debe haber un ganador definitivo.");
+            return;
+        }
+
+        const campeon = fL > fV ? ganadorS1 : ganadorS2;
+        document.getElementById('campeon-anuncio').innerText = `🎉 ¡EL CAMPEÓN DEL TORNEO ES ${campeon.toUpperCase()}! 🎉`;
+    }
+
+    // Auto-cargar al abrir la página y actualizar automáticamente cada 30 segundos
+    cargarDatosDesdeGoogle();
+    setInterval(cargarDatosDesdeGoogle, 30000); 
+</script>
+</body>
+</html>
