@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestor de Torneo de Fútbol</title>
+    <title>Torneo de Fútbol - Formato Corto</title>
     <style>
         :root {
             --primary: #1e3a8a;
@@ -70,7 +70,7 @@
             border-left: 4px solid var(--secondary);
         }
         .match-card input {
-            width: 40px;
+            width: 45px;
             text-align: center;
             font-size: 16px;
             padding: 3px;
@@ -95,16 +95,16 @@
             align-items: center;
             margin-top: 20px;
         }
-        .phase { text-align: center; }
+        .phase { text-align: center; width: 45%; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>🏆 Gestor de Torneo de Fútbol</h1>
+    <h1>🏆 Torneo de Fútbol</h1>
 
     <div id="setup" class="setup-section">
-        <h2>Registro de Equipos</h2>
+        <h2>Ingresa los Equipos</h2>
         <div class="groups-container">
             <div class="group-box">
                 <h3>Grupo A</h3>
@@ -119,7 +119,7 @@
                 <input type="text" id="b3" value="Equipo B3" style="width:90%; margin:5px; padding:5px;">
             </div>
         </div>
-        <button onclick="iniciarTorneo()">Generar Torneo</button>
+        <button onclick="iniciarTorneo()">Iniciar Fase de Grupos</button>
     </div>
 
     <div id="tournament" class="tournament-section hidden">
@@ -129,7 +129,7 @@
                 <h3>Grupo A</h3>
                 <table>
                     <thead>
-                        <tr><th>Equipo</th><th>Pts</th><th>PJ</th><th>GF</th><th>GC</th></tr>
+                        <tr><th>Equipo</th><th>Pts</th><th>PJ</th><th>GF</th><th>GC</th><th>DG</th></tr>
                     </thead>
                     <tbody id="tabla-A"></tbody>
                 </table>
@@ -138,7 +138,7 @@
                 <h3>Grupo B</h3>
                 <table>
                     <thead>
-                        <tr><th>Equipo</th><th>Pts</th><th>PJ</th><th>GF</th><th>GC</th></tr>
+                        <tr><th>Equipo</th><th>Pts</th><th>PJ</th><th>GF</th><th>GC</th><th>DG</th></tr>
                     </thead>
                     <tbody id="tabla-B"></tbody>
                 </table>
@@ -147,9 +147,9 @@
 
         <hr style="margin: 40px 0; border: 1px solid #eee;">
 
-        <h2>Calendario de Partidos (Fase de Grupos)</h2>
+        <h2>Partidos del Grupo</h2>
         <div id="partidos-lista"></div>
-        <button onclick="actualizarTorneo()">Actualizar Tabla y Verificar Clasificados</button>
+        <button onclick="actualizarTorneo()">Actualizar Tablas y Calcular Clasificados</button>
 
         <hr style="margin: 40px 0; border: 1px solid #eee;">
 
@@ -158,16 +158,18 @@
             <div class="bracket">
                 <div class="phase">
                     <h3>Semifinales</h3>
+                    <p style="font-size:12px; color:gray;">1ºA vs 2ºB</p>
                     <div id="semi1" class="match-card"></div>
+                    <p style="font-size:12px; color:gray; margin-top:15px;">2ºA vs 1ºB</p>
                     <div id="semi2" class="match-card"></div>
                 </div>
                 <div class="phase">
                     <h3>Gran Final</h3>
                     <div id="final-match" class="match-card"></div>
-                    <button onclick="definirCampeon()" id="btn-campeon">Definir Campeón</button>
+                    <button onclick="definirCampeon()" id="btn-campeon">Generar Final</button>
                 </div>
             </div>
-            <h1 id="campeon-anuncio" style="color: var(--secondary); margin-top: 30px;"></h1>
+            <h1 id="campeon-anuncio" style="text-align:center; color: var(--secondary); margin-top: 30px;"></h1>
         </div>
     </div>
 </div>
@@ -180,38 +182,31 @@
 
     function iniciarTorneo() {
         equipos.A = [
-            { nombre: document.getElementById('a1').value, pts: 0, pj: 0, gf: 0, gc: 0, grupo: 'A' },
-            { nombre: document.getElementById('a2').value, pts: 0, pj: 0, gf: 0, gc: 0, grupo: 'A' },
-            { nombre: document.getElementById('a3').value, pts: 0, pj: 0, gf: 0, gc: 0, grupo: 'A' }
+            { nombre: document.getElementById('a1').value, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 },
+            { nombre: document.getElementById('a2').value, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 },
+            { nombre: document.getElementById('a3').value, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 }
         ];
         equipos.B = [
-            { nombre: document.getElementById('b1').value, pts: 0, pj: 0, gf: 0, gc: 0, grupo: 'B' },
-            { nombre: document.getElementById('b2').value, pts: 0, pj: 0, gf: 0, gc: 0, bundle: 'B' },
-            { nombre: document.getElementById('b3').value, pts: 0, pj: 0, gf: 0, gc: 0, grupo: 'B' }
+            { nombre: document.getElementById('b1').value, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 },
+            { nombre: document.getElementById('b2').value, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 },
+            { nombre: document.getElementById('b3').value, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 }
         ];
 
-        generarCalendario();
+        generarCalendarioExclusivo();
         document.getElementById('setup').classList.add('hidden');
         document.getElementById('tournament').classList.remove('hidden');
         renderTablas();
     }
 
-    function generarCalendario() {
+    function generarCalendarioExclusivo() {
         partidos = [];
-        // 1. Partidos Intragrupo (A contra A, B contra B)
+        // Solo partidos internos (3 partidos por grupo)
         for(let i=0; i<3; i++) {
             for(let j=i+1; j<3; j++) {
-                partidos.push({ local: equipos.A[i], visitante: equipos.A[j], golesL: null, golesV: null, tipo: 'Intragrupo' });
-                partidos.push({ local: equipos.B[i], visitante: equipos.B[j], golesL: null, golesV: null, tipo: 'Intragrupo' });
+                partidos.push({ local: equipos.A[i], visitante: equipos.A[j], golesL: null, golesV: null, grupo: 'A' });
+                partidos.push({ local: equipos.B[i], visitante: equipos.B[j], golesL: null, golesV: null, grupo: 'B' });
             }
         }
-        // 2. Partidos Intergrupo (A contra B)
-        for(let i=0; i<3; i++) {
-            for(let j=0; j<3; j++) {
-                partidos.push({ local: equipos.A[i], visitante: equipos.B[j], golesL: null, golesV: null, tipo: 'Intergrupo' });
-            }
-        }
-
         renderPartidos();
     }
 
@@ -221,7 +216,7 @@
         partidos.forEach((partido, index) => {
             contenedor.innerHTML += `
                 <div class="match-card">
-                    <span style="font-size:12px; color:gray; width:80px;">${partido.tipo}</span>
+                    <span style="font-size:12px; color:gray; width:60px;">Grupo ${partido.grupo}</span>
                     <span style="width:150px; text-align:right;"><b>${partido.local.nombre}</b></span>
                     <input type="number" id="p-${index}-L" min="0" onchange="guardarResultado(${index})">
                     <span>vs</span>
@@ -244,14 +239,16 @@
 
     function actualizarTorneo() {
         // Reiniciar estadísticas
-        [...equipos.A, ...equipos.B].forEach(e => { e.pts = 0; e.pj = 0; e.gf = 0; e.gc = 0; });
+        [...equipos.A, ...equipos.B].forEach(e => { e.pts = 0; e.pj = 0; e.gf = 0; e.gc = 0; e.dg = 0; });
 
-        // Calcular con partidos jugados
+        // Procesar partidos
         partidos.forEach(p => {
             if(p.golesL !== null && p.golesV !== null) {
                 p.local.pj++; p.visitante.pj++;
                 p.local.gf += p.golesL; p.local.gc += p.golesV;
                 p.visitante.gf += p.golesV; p.visitante.gc += p.golesL;
+                p.local.dg = p.local.gf - p.local.gc;
+                p.visitante.dg = p.visitante.gf - p.visitante.gc;
 
                 if(p.golesL > p.golesV) p.local.pts += 3;
                 else if(p.golesV > p.golesL) p.visitante.pts += 3;
@@ -259,16 +256,17 @@
             }
         });
 
-        // Ordenar tablas (Criterio: Puntos, luego Diferencia de Goles)
-        equipos.A.sort((a,b) => b.pts - a.pts || (b.gf - b.gc) - (a.gf - a.gc));
-        equipos.B.sort((a,b) => b.pts - a.pts || (b.gf - b.gc) - (a.gf - a.gc));
+        // Ordenar por Puntos, luego Diferencia de Goles, luego Goles a Favor
+        equipos.A.sort((a,b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf);
+        equipos.B.sort((a,b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf);
 
         renderTablas();
 
-        // Verificar si todos los partidos de grupo terminaron para armar semifinales
         const listos = partidos.every(p => p.golesL !== null && p.golesV !== null);
         if(listos) {
             armarSemifinales();
+        } else {
+            alert("Tablas actualizadas. Completa todos los partidos de grupo para activar las semifinales.");
         }
     }
 
@@ -277,7 +275,7 @@
             const tbody = document.getElementById(`tabla-${g}`);
             tbody.innerHTML = '';
             equipos[g].forEach(e => {
-                tbody.innerHTML += `<tr><td>${e.nombre}</td><td>${e.pts}</td><td>${e.pj}</td><td>${e.gf}</td><td>${e.gc}</td></tr>`;
+                tbody.innerHTML += `<tr><td>${e.nombre}</td><td>${e.pts}</td><td>${e.pj}</td><td>${e.gf}</td><td>${e.gc}</td><td>${e.dg}</td></tr>`;
             });
         });
     }
@@ -285,9 +283,10 @@
     function armarSemifinales() {
         document.getElementById('eliminatorias-seccion').classList.remove('hidden');
         
+        // Cruce: 1ºA vs 2ºB y 2ºA vs 1ºB
         semifinales = [
-            { local: equipos.A[0].nombre, visitante: equipos.B[1].nombre }, // 1ºA vs 2ºB
-            { local: equipos.B[0].nombre, visitante: equipos.A[1].nombre }  // 1ºB vs 2ºA
+            { local: equipos.A[0].nombre, visitante: equipos.B[1].nombre },
+            { local: equipos.A[1].nombre, visitante: equipos.B[0].nombre }
         ];
 
         document.getElementById('semi1').innerHTML = `
@@ -297,7 +296,6 @@
             <span>${semifinales[1].local}</span> <input type="number" id="s2-L"> vs <input type="number" id="s2-V"> <span>${semifinales[1].visitante}</span>
         `;
         
-        // Habilitar el botón de la final cuando se actualicen los campos correspondientes
         document.getElementById('btn-campeon').setAttribute('onclick', 'armarFinal()');
         document.getElementById('btn-campeon').innerText = "Generar Final";
     }
@@ -312,9 +310,8 @@
             alert("Por favor, ingresa los resultados de ambas semifinales.");
             return;
         }
-
         if(s1L === s1V || s2L === s2V) {
-            alert("En eliminatoria directa debe haber un ganador (puedes definirlo por penales si empatan).");
+            alert("No puede haber empates en semifinales. Define al ganador por penales si empataron.");
             return;
         }
 
@@ -340,7 +337,7 @@
             return;
         }
         if(fL === fV) {
-            alert("Debe haber un campeón. Desempata por penales si es necesario.");
+            alert("Debe haber un campeón definitivo. Desempata por penales si es necesario.");
             return;
         }
 
