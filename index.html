@@ -10,186 +10,234 @@
             --secondary: #10b981;
             --dark: #1f2937;
             --light: #f3f4f6;
+            --gray-light: #e5e7eb;
         }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--light);
             color: var(--dark);
-            margin: 0;
-            padding: 20px;
+            padding: 10px;
         }
+
         .container {
-            max-width: 1000px;
+            max-width: 900px;
             margin: 0 auto;
+            padding: 10px 0;
         }
-        h1, h2, h3 {
+
+        h1 {
+            font-size: 1.8rem;
             text-align: center;
             color: var(--primary);
+            margin-bottom: 5px;
         }
-        .section {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+
+        .subtitle {
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.9rem;
             margin-bottom: 20px;
         }
+
+        .section {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 5px;
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            color: var(--dark);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        /* DISEÑO RESPONSIVE PARA TABLAS Y GRUPOS */
         .groups-container {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr;
             gap: 20px;
-            margin-top: 20px;
         }
-        @media (max-width: 768px) {
-            .groups-container { grid-template-columns: 1fr; }
+
+        @media (min-width: 768px) {
+            .groups-container {
+                grid-template-columns: 1fr 1fr;
+            }
         }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            font-size: 0.9rem;
         }
+
         th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            padding: 10px 8px;
+            text-align: center;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        th {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        /* DISEÑO RESPONSIVE PARA TARJETAS DE PARTIDOS */
+        .match-card {
+            display: grid;
+            grid-template-columns: 1fr auto auto auto 1fr;
+            align-items: center;
+            gap: 8px;
+            background: #f9fafb;
+            padding: 12px 8px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary);
+            font-size: 0.95rem;
+        }
+
+        .team-home { text-align: right; font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .team-away { text-align: left; font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        
+        .score-display {
+            font-weight: bold;
+            background: var(--gray-light);
+            padding: 4px 10px;
+            border-radius: 4px;
+            min-width: 32px;
             text-align: center;
         }
-        th { background-color: var(--primary); color: white; }
-        .match-card {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            background: #f9fafb;
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 6px;
-            border-left: 4px solid var(--secondary);
-            font-size: 16px;
+
+        .vs-text {
+            color: #9ca3af;
+            font-size: 0.8rem;
+            font-weight: bold;
         }
+
+        .group-tag {
+            grid-column: 1 / -1;
+            font-size: 0.75rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: -4px;
+        }
+
+        /* BADGE EN VIVO ANIMADO */
         .live-badge {
             background-color: #ef4444;
             color: white;
             padding: 2px 6px;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 0.75rem;
             font-weight: bold;
             animation: pulse 1.5s infinite;
             display: inline-block;
             vertical-align: middle;
-            margin-left: 10px;
+            margin-left: 5px;
         }
+
         @keyframes pulse {
             0% { opacity: 1; }
             50% { opacity: 0.4; }
             100% { opacity: 1; }
         }
-        .bracket {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            margin-top: 20px;
-        }
-        .phase { text-align: center; width: 45%; }
-        .score-display {
-            font-weight: bold;
-            background: #e5e7eb;
-            padding: 4px 10px;
-            border-radius: 4px;
-            min-width: 25px;
-            display: inline-block;
-        }
+
         button {
             background-color: var(--primary);
             color: white;
             border: none;
-            padding: 10px 20px;
-            font-size: 15px;
-            border-radius: 5px;
+            padding: 12px 20px;
+            font-size: 0.95rem;
+            border-radius: 6px;
             cursor: pointer;
             display: block;
-            margin: 10px auto;
+            width: 100%;
+            max-width: 300px;
+            margin: 15px auto;
+            font-weight: bold;
+            transition: background 0.2s;
         }
-        input[type="number"] {
-            width: 45px;
-            text-align: center;
-            font-size: 16px;
-        }
+        button:hover { background-color: #172554; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>🏆 Torneo de Fútbol <span class="live-badge">EN VIVO</span></h1>
-    <p style="text-align: center; color: gray;">Resultados actualizados desde Google Sheets (CSV)</p>
+    <p class="subtitle">Resultados actualizados desde Google Sheets automáticamente</p>
     
-    <button onclick="cargarDatosDesdeGoogle()">🔄 Recargar Resultados Manualmente</button>
+    <button onclick="cargarDatosDesdeGoogle()">🔄 Actualizar Marcadores</button>
 
     <div class="section">
         <h2>Tablas de Posiciones</h2>
         <div class="groups-container">
             <div>
                 <h3>Grupo A</h3>
-                <table>
-                    <thead>
-                        <tr><th>Equipo</th><th>Pts</th><th>PJ</th><th>GF</th><th>GC</th><th>DG</th></tr>
-                    </thead>
-                    <tbody id="tabla-A"><tr><td colspan="6">Cargando...</td></tr></tbody>
-                </table>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr><th>Equipo</th><th>Pts</th><th>PJ</th><th>GF</th><th>GC</th><th>DG</th></tr>
+                        </thead>
+                        <tbody id="tabla-A"><tr><td colspan="6">Cargando equipos...</td></tr></tbody>
+                    </table>
+                </div>
             </div>
             <div>
                 <h3>Grupo B</h3>
-                <table>
-                    <thead>
-                        <tr><th>Equipo</th><th>Pts</th><th>PJ</th><th>GF</th><th>GC</th><th>DG</th></tr>
-                    </thead>
-                    <tbody id="tabla-B"><tr><td colspan="6">Cargando...</td></tr></tbody>
-                </table>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr><th>Equipo</th><th>Pts</th><th>PJ</th><th>GF</th><th>GC</th><th>DG</th></tr>
+                        </thead>
+                        <tbody id="tabla-B"><tr><td colspan="6">Cargando equipos...</td></tr></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="section">
         <h2>Resultados Fase de Grupos</h2>
-        <div id="partidos-lista">Cargando partidos...</div>
+        <div id="partidos-lista">Cargando partidos de grupos...</div>
     </div>
 
-    <div id="eliminatorias-seccion" class="section">
+    <div class="section">
         <h2>Fase Final (Eliminatoria Directa)</h2>
-        <p style="text-align:center; font-size:13px; color:gray;">Nota: Define los cruces de las fases eliminatorias aquí mismo conforme terminen los grupos.</p>
-        <div class="bracket">
-            <div class="phase">
-                <h3>Semifinales</h3>
-                <p style="font-size:12px; color:gray; margin-bottom: 2px;">Semi 1 (1ºA vs 2ºB)</p>
-                <div class="match-card">
-                    <span id="lbl-s1-L">1º Lugar A</span> 
-                    <input type="number" id="s1-L" min="0"> vs <input type="number" id="s1-V" min="0"> 
-                    <span id="lbl-s1-V">2º Lugar B</span>
-                </div>
-                
-                <p style="font-size:12px; color:gray; margin: 15px 0 2px 0;">Semi 2 (2ºA vs 1ºB)</p>
-                <div class="match-card">
-                    <span id="lbl-s2-L">2º Lugar A</span> 
-                    <input type="number" id="s2-L" min="0"> vs <input type="number" id="s2-V" min="0"> 
-                    <span id="lbl-s2-B">1º Lugar B</span>
-                </div>
-                <button onclick="generarFinal()">Avanzar a la Final</button>
-            </div>
-            <div class="phase">
-                <h3>Gran Final</h3>
-                <div class="match-card">
-                    <span id="final-L">Ganador Semi 1</span> 
-                    <input type="number" id="f-L" min="0"> vs <input type="number" id="f-V" min="0"> 
-                    <span id="final-V">Ganador Semi 2</span>
-                </div>
-                <button onclick="definirCampeon()" style="background-color: var(--secondary);">🏆 Definir Campeón</button>
-            </div>
-        </div>
-        <h1 id="campeon-anuncio" style="text-align:center; color: var(--secondary); margin-top: 30px;"></h1>
+        <div id="eliminatorias-lista">Cargando fase final...</div>
     </div>
 </div>
 
 <script>
-    // ⚠️ PEGA AQUÍ TU ENLACE DE PUBLICACIÓN EN LA WEB (CSV) ⚠️
-    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQHhMSGg5Au2lIFI7rh3iMZFX-ucTcgs1vLsqFAPMALrDKp2MK-W6GuOz-WhGubjpyv-6Z9DXxnTpfB/pub?output=csv'; 
+    // ⚠️ REEMPLAZA ESTA URL CON TU ENLACE CSV DE "PUBLICAR EN LA WEB" ⚠️
+    const CSV_URL = 'PEGA_AQUI_TU_ENLACE_CSV_DE_GOOGLE'; 
 
     let equiposA = {};
     let equiposB = {};
@@ -199,19 +247,19 @@
             const respuesta = await fetch(CSV_URL);
             const textoCSV = await respuesta.text();
             
-            // Procesar las líneas del CSV
-            const lineas = textoCSV.split('\n').map(linea => linea.split(','));
+            const usarPuntoYComa = textoCSV.includes(';');
+            const separador = usarPuntoYComa ? ';' : ',';
+            const lineas = textoCSV.split('\n').map(linea => linea.split(separador));
             
             equiposA = {};
             equiposB = {};
             const partidosHTML = [];
+            const eliminatoriasHTML = [];
 
-            // Empezamos en i = 1 para saltarnos la fila de encabezados (Grupo, Local, etc.)
             for (let i = 1; i < lineas.length; i++) {
                 const fila = lineas[i];
                 if (fila.length < 5) continue;
 
-                // Limpiar comillas extras si Google Sheets las añade
                 const grupo = fila[0].replace(/"/g, '').trim();
                 const local = fila[1].replace(/"/g, '').trim();
                 const golesLRaw = fila[2].replace(/"/g, '').trim();
@@ -222,130 +270,99 @@
 
                 const golesL = golesLRaw !== "" ? parseInt(golesLRaw) : null;
                 const golesV = golesVRaw !== "" ? parseInt(golesVRaw) : null;
-
-                if (grupo === 'A') {
-                    if (!equiposA[local]) equiposA[local] = { nombre: local, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 };
-                    if (!equiposA[visitante]) equiposA[visitante] = { nombre: visitante, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 };
-                } else if (grupo === 'B') {
-                    if (!equiposB[local]) equiposB[local] = { nombre: local, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 };
-                    if (!equiposB[visitante]) equiposB[visitante] = { nombre: visitante, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 };
-                }
-
-                if (golesL !== null && !isNaN(golesL) && golesV !== null && !isNaN(golesV)) {
-                    let eqL = grupo === 'A' ? equiposA[local] : equiposB[local];
-                    let eqV = group === 'A' || grupo === 'A' ? equiposA[visitante] : equiposB[visitante];
-
-                    eqL.pj++; eqV.pj++;
-                    eqL.gf += golesL; eqL.gc += golesV;
-                    eqV.gf += golesV; eqV.gc += golesL;
-                    eqL.dg = eqL.gf - eqL.gc;
-                    eqV.dg = eqV.gf - eqV.gc;
-
-                    if (golesL > golesV) eqL.pts += 3;
-                    else if (golesV > golesL) eqV.pts += 3;
-                    else { eqL.pts += 1; eqV.pts += 1; }
-                }
-
                 const displayL = (golesL !== null && !isNaN(golesL)) ? golesL : '-';
                 const displayV = (golesV !== null && !isNaN(golesV)) ? golesV : '-';
-                
-                partidosHTML.push(`
-                    <div class="match-card">
-                        <span style="font-size:12px; color:gray; width:60px;">Grupo ${grupo}</span>
-                        <span style="width:180px; text-align:right;"><b>${local}</b></span>
-                        <span class="score-display">${displayL}</span>
-                        <span>vs</span>
-                        <span class="score-display">${displayV}</span>
-                        <span style="width:180px; text-align:left;"><b>${visitante}</b></span>
-                    </div>
-                `);
+
+                // Verificar si es partido de grupo o eliminatoria directa
+                const esEliminatoria = grupo.toLowerCase().includes('semi') || grupo.toLowerCase().includes('final');
+
+                if (!esEliminatoria) {
+                    // Lógica de Fase de Grupos
+                    if (grupo.toUpperCase() === 'A') {
+                        if (!equiposA[local]) equiposA[local] = { nombre: local, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 };
+                        if (!equiposA[visitante]) equiposA[visitante] = { nombre: visitante, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 };
+                    } else if (grupo.toUpperCase() === 'B') {
+                        if (!equiposB[local]) equiposB[local] = { nombre: local, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 };
+                        if (!equiposB[visitante]) equiposB[visitante] = { nombre: visitante, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 };
+                    }
+
+                    if (golesL !== null && !isNaN(golesL) && golesV !== null && !isNaN(golesV)) {
+                        let eqL = (grupo.toUpperCase() === 'A') ? equiposA[local] : equiposB[local];
+                        let eqV = (grupo.toUpperCase() === 'A') ? equiposA[visitante] : equiposB[visitante];
+
+                        eqL.pj++; eqV.pj++;
+                        eqL.gf += golesL; eqL.gc += golesV;
+                        eqV.gf += golesV; eqV.gc += golesL;
+                        eqL.dg = eqL.gf - eqL.gc;
+                        eqV.dg = eqV.gf - eqV.gc;
+
+                        if (golesL > golesV) eqL.pts += 3;
+                        else if (golesV > golesL) eqV.pts += 3;
+                        else { eqL.pts += 1; eqV.pts += 1; }
+                    }
+
+                    partidosHTML.push(`
+                        <div class="match-card">
+                            <span class="team-home">${local}</span>
+                            <span class="score-display">${displayL}</span>
+                            <span class="vs-text">VS</span>
+                            <span class="score-display">${displayV}</span>
+                            <span class="team-away">${visitante}</span>
+                        </div>
+                    `);
+                } else {
+                    // Lógica de Eliminatoria Directa (Semifinales y Finales)
+                    eliminatoriasHTML.push(`
+                        <div style="margin-top: 10px; font-size: 0.8rem; color: #4b5563; font-weight: bold; text-transform: uppercase;">${grupo}</div>
+                        <div class="match-card" style="border-left: 4px solid var(--primary); background: #f0f4ff;">
+                            <span class="team-home">${local}</span>
+                            <span class="score-display" style="background: #cbd5e1;">${displayL}</span>
+                            <span class="vs-text">VS</span>
+                            <span class="score-display" style="background: #cbd5e1;">${displayV}</span>
+                            <span class="team-away">${visitante}</span>
+                        </div>
+                    `);
+                }
             }
 
-            document.getElementById('partidos-lista').innerHTML = partidosHTML.join('');
-            procesarYRenderizarTablas();
+            document.getElementById('partidos-lista').innerHTML = partidosHTML.length ? partidosHTML.join('') : "<p style='text-align:center;color:gray;'>No hay partidos configurados.</p>";
+            document.getElementById('eliminatorias-lista').innerHTML = eliminatoriasHTML.length ? eliminatoriasHTML.join('') : "<p style='text-align:center;color:gray;'>No hay llaves configuradas.</p>";
+            
+            renderizarTablas();
 
         } catch (error) {
-            console.error("Error cargando datos:", error);
-            alert("No se pudieron procesar los datos. Verifica el enlace 'Publicar en la web' en formato CSV.");
+            console.error("Error:", error);
         }
     }
 
-    function procesarYRenderizarTablas() {
+    function renderizarTablas() {
         let listaA = Object.values(equiposA).sort((a,b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf);
         let listaB = Object.values(equiposB).sort((a,b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf);
 
         renderTablaHtml(listaA, 'tabla-A');
         renderTablaHtml(listaB, 'tabla-B');
-
-        if(listaA.length >= 2 && listaB.length >= 2) {
-            document.getElementById('lbl-s1-L').innerText = `1ºA: ${listaA[0].nombre}`;
-            document.getElementById('lbl-s1-V').innerText = `2ºB: ${listaB[1].nombre}`;
-            document.getElementById('lbl-s2-L').innerText = `2ºA: ${listaA[1].nombre}`;
-            document.getElementById('lbl-s2-B').innerText = `1ºB: ${listaB[0].nombre}`;
-        }
     }
 
     function renderTablaHtml(lista, elementoId) {
         const tbody = document.getElementById(elementoId);
         tbody.innerHTML = '';
         if(lista.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6">Sin datos de equipos</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6">Sin datos</td></tr>`;
             return;
         }
         lista.forEach(e => {
             tbody.innerHTML += `<tr>
-                <td><b>${e.nombre}</b></td>
-                <td>${e.pts}</td>
+                <td style="text-align:left; font-weight:bold;">${e.nombre}</td>
+                <td><b>${e.pts}</b></td>
                 <td>${e.pj}</td>
                 <td>${e.gf}</td>
                 <td>${e.gc}</td>
-                <td>${e.dg >= 0 ? '+'+e.dg : e.dg}</td>
+                <td style="color:${e.dg >= 0 ? 'green':'red'}">${e.dg >= 0 ? '+'+e.dg : e.dg}</td>
             </tr>`;
         });
     }
 
-    let ganadorS1 = "";
-    let ganadorS2 = "";
-
-    function generarFinal() {
-        const s1L = parseInt(document.getElementById('s1-L').value);
-        const s1V = parseInt(document.getElementById('s1-V').value);
-        const s2L = parseInt(document.getElementById('s2-L').value);
-        const s2V = parseInt(document.getElementById('s2-V').value);
-
-        if(isNaN(s1L) || isNaN(s1V) || isNaN(s2L) || isNaN(s2V)) {
-            alert("Por favor, digita los goles de las dos semifinales.");
-            return;
-        }
-        if(s1L === s1V || s2L === s2V) {
-            alert("No puede haber empates en semifinales. Desempata por penales.");
-            return;
-        }
-
-        ganadorS1 = s1L > s1V ? document.getElementById('lbl-s1-L').innerText.split(': ')[1] : document.getElementById('lbl-s1-V').innerText.split(': ')[1];
-        ganadorS2 = s2L > s2V ? document.getElementById('lbl-s2-L').innerText.split(': ')[1] : document.getElementById('lbl-s2-B').innerText.split(': ')[1];
-
-        document.getElementById('final-L').innerText = ganadorS1;
-        document.getElementById('final-V').innerText = ganadorS2;
-    }
-
-    function definirCampeon() {
-        const fL = parseInt(document.getElementById('f-L').value);
-        const fV = parseInt(document.getElementById('f-V').value);
-
-        if(isNaN(fL) || isNaN(fV)) {
-            alert("Ingresa el marcador de la Gran Final.");
-            return;
-        }
-        if(fL === fV) {
-            alert("Debe haber un ganador definitivo.");
-            return;
-        }
-
-        const campeon = fL > fV ? ganadorS1 : ganadorS2;
-        document.getElementById('campeon-anuncio').innerText = `🎉 ¡EL CAMPEÓN DEL TORNEO ES ${campeon.toUpperCase()}! 🎉`;
-    }
-
+    // Carga inicial y auto-refresco cada 30 segundos
     cargarDatosDesdeGoogle();
     setInterval(cargarDatosDesdeGoogle, 30000); 
 </script>
