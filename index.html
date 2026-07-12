@@ -141,15 +141,6 @@
             font-weight: bold;
         }
 
-        .group-tag {
-            grid-column: 1 / -1;
-            font-size: 0.75rem;
-            color: #6b7280;
-            text-transform: uppercase;
-            font-weight: bold;
-            margin-bottom: -4px;
-        }
-
         /* BADGE EN VIVO ANIMADO */
         .live-badge {
             background-color: #ef4444;
@@ -237,7 +228,7 @@
 
 <script>
     // ⚠️ REEMPLAZA ESTA URL CON TU ENLACE CSV DE "PUBLICAR EN LA WEB" ⚠️
-    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQHhMSGg5Au2lIFI7rh3iMZFX-ucTcgs1vLsqFAPMALrDKp2MK-W6GuOz-WhGubjpyv-6Z9DXxnTpfB/pub?output=csv'; 
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPhg3tLgbyC2G_N1hV6vY29X-V9gsSygs... (PEGA TU LINK COMPLETO AQUÍ)'; 
 
     let equiposA = {};
     let equiposB = {};
@@ -247,6 +238,7 @@
             const respuesta = await fetch(CSV_URL);
             const textoCSV = await respuesta.text();
             
+            // Detectar automáticamente si Google separa por comas (,) o puntos y comas (;)
             const usarPuntoYComa = textoCSV.includes(';');
             const separador = usarPuntoYComa ? ';' : ',';
             const lineas = textoCSV.split('\n').map(linea => linea.split(separador));
@@ -273,11 +265,10 @@
                 const displayL = (golesL !== null && !isNaN(golesL)) ? golesL : '-';
                 const displayV = (golesV !== null && !isNaN(golesV)) ? golesV : '-';
 
-                // Verificar si es partido de grupo o eliminatoria directa
                 const esEliminatoria = grupo.toLowerCase().includes('semi') || grupo.toLowerCase().includes('final');
 
                 if (!esEliminatoria) {
-                    // Lógica de Fase de Grupos
+                    // Inicializar si no existen en el grupo correcto
                     if (grupo.toUpperCase() === 'A') {
                         if (!equiposA[local]) equiposA[local] = { nombre: local, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 };
                         if (!equiposA[visitante]) equiposA[visitante] = { nombre: visitante, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 };
@@ -286,19 +277,22 @@
                         if (!equiposB[visitante]) equiposB[visitante] = { nombre: visitante, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0 };
                     }
 
+                    // Calcular estadísticas de fase de grupos
                     if (golesL !== null && !isNaN(golesL) && golesV !== null && !isNaN(golesV)) {
                         let eqL = (grupo.toUpperCase() === 'A') ? equiposA[local] : equiposB[local];
                         let eqV = (grupo.toUpperCase() === 'A') ? equiposA[visitante] : equiposB[visitante];
 
-                        eqL.pj++; eqV.pj++;
-                        eqL.gf += golesL; eqL.gc += golesV;
-                        eqV.gf += golesV; eqV.gc += golesL;
-                        eqL.dg = eqL.gf - eqL.gc;
-                        eqV.dg = eqV.gf - eqV.gc;
+                        if (eqL && eqV) {
+                            eqL.pj++; eqV.pj++;
+                            eqL.gf += golesL; eqL.gc += golesV;
+                            eqV.gf += golesV; eqV.gc += golesL;
+                            eqL.dg = eqL.gf - eqL.gc;
+                            eqV.dg = eqV.gf - eqV.gc;
 
-                        if (golesL > golesV) eqL.pts += 3;
-                        else if (golesV > golesL) eqV.pts += 3;
-                        else { eqL.pts += 1; eqV.pts += 1; }
+                            if (golesL > golesV) eqL.pts += 3;
+                            else if (golesV > golesL) eqV.pts += 3;
+                            else { eqL.pts += 1; eqV.pts += 1; }
+                        }
                     }
 
                     partidosHTML.push(`
@@ -311,7 +305,7 @@
                         </div>
                     `);
                 } else {
-                    // Lógica de Eliminatoria Directa (Semifinales y Finales)
+                    // Lógica para renderizar las llaves finales directamente desde el Sheet
                     eliminatoriasHTML.push(`
                         <div style="margin-top: 10px; font-size: 0.8rem; color: #4b5563; font-weight: bold; text-transform: uppercase;">${grupo}</div>
                         <div class="match-card" style="border-left: 4px solid var(--primary); background: #f0f4ff;">
@@ -325,13 +319,13 @@
                 }
             }
 
-            document.getElementById('partidos-lista').innerHTML = partidosHTML.length ? partidosHTML.join('') : "<p style='text-align:center;color:gray;'>No hay partidos configurados.</p>";
-            document.getElementById('eliminatorias-lista').innerHTML = eliminatoriasHTML.length ? eliminatoriasHTML.join('') : "<p style='text-align:center;color:gray;'>No hay llaves configuradas.</p>";
+            document.getElementById('partidos-lista').innerHTML = partidosHTML.length ? partidosHTML.join('') : "<p style='text-align:center;color:gray;'>No hay partidos de grupo configurados.</p>";
+            document.getElementById('eliminatorias-lista').innerHTML = eliminatoriasHTML.length ? eliminatoriasHTML.join('') : "<p style='text-align:center;color:gray;'>No hay llaves de eliminatorias configuradas.</p>";
             
             renderizarTablas();
 
         } catch (error) {
-            console.error("Error:", error);
+            console.error("Error cargando datos:", error);
         }
     }
 
@@ -347,7 +341,7 @@
         const tbody = document.getElementById(elementoId);
         tbody.innerHTML = '';
         if(lista.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6">Sin datos</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6">Sin datos de equipos</td></tr>`;
             return;
         }
         lista.forEach(e => {
@@ -362,7 +356,7 @@
         });
     }
 
-    // Carga inicial y auto-refresco cada 30 segundos
+    // Ejecutar carga inicial y actualizar cada 30 segundos
     cargarDatosDesdeGoogle();
     setInterval(cargarDatosDesdeGoogle, 30000); 
 </script>
